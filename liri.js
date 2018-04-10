@@ -4,8 +4,7 @@ var request = require("request");
 var Twitter = require("twitter");
 var Spotify = require('node-spotify-api');
 
-
-
+var nodeArgv = process.argv;
 var command = process.argv[2];
 
 // We will then create a switch-case statement (if-else would also work).
@@ -38,17 +37,29 @@ function tweet () {
      });
 }
 
-function song () {
+function song (songName) {
     var spotify = new Spotify(keys.spotify);
     var songName = process.argv[3];
-    spotify.search({ type: 'track', query: songName }, function(err, data) {
-        if (err) {
-          return console.log('Error occurred: ' + err);
+    spotify
+    .search({ type: 'track', query: songName })
+    .then(function(response) {
+        for (var i = 0; i < 20; i++){
+            var results = response.tracks.items[i];
+            var artist = results.artists[0].name;
+            var track = results.name;
+            var album = results.album;
+            var preview = results.preview_url;
+            console.log(`
+            Artist(s):    ${artist}
+            Song Name:    ${track}
+            Album:        ${album}
+            Preview Link: ${preview}
+              `);
         }
-       
-
-      console.log('Search by songName',data); 
-      });
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
 }
 
 function movie() {
